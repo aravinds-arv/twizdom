@@ -1,0 +1,9 @@
+[twitter_api]
+consumer_key = <YOUR_TWITTER_API_CONSUMER_KEY>
+consumer_secret = <YOUR_TWITTER_API_CONSUMER_SECRET>
+access_key = <YOUR_TWITTER_API_ACCESS_KEY>
+access_secret = <YOUR_TWITTER_API_ACCESS_SECRET>
+
+[paperquotes_api]
+; generate and replace default with your own key to avoid ratelimiting
+token = f45946f5d9d776657ae77c4905ce41ff9c800149

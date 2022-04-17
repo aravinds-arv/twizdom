@@ -1,19 +1,24 @@
-from io import BytesIO
+import os
 import tweepy
 import random
 import textwrap
+import configparser
 import requests, json
 from tkinter import *
 from PIL import ImageTk, Image
 from string import ascii_letters
 from PIL import Image, ImageDraw, ImageFont
 
-CONSUMER_KEY = "L1K7CFCPvOlJZVJAyI6oxdq85"
-CONSUMER_SECRET = "PVeybBGJ4LWwvaAC2h1oSF5lYBJbfba2XyV3sHyzW32AnCwPEC"
-ACCESS_KEY = "1356929686387912706-vSCiebzuDdFD3upJPUxivswHcPQmKJ"
-ACCESS_SECRET = "t5tBkQ0PmE6KXoQrCPXLhoyynGLqznEfhyOIZenge6FPr"
+directory = os.path.dirname(os.path.realpath(__file__))
+config = configparser.ConfigParser()
+config.read(f'{directory}/config.ini')
 
-TOKEN = 'f45946f5d9d776657ae77c4905ce41ff9c800149'
+CONSUMER_KEY = str(config.get('twitter_api', 'consumer_key'))
+CONSUMER_SECRET = str(config.get('twitter_api', 'consumer_secret'))
+ACCESS_KEY = str(config.get('twitter_api', 'access_key'))
+ACCESS_SECRET = str(config.get('twitter_api', 'access_secret'))
+
+PAPERQUOTES_TOKEN = str(config.get('paperquotes_api', 'token'))
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
@@ -40,7 +45,7 @@ def tweetFn():
     moodOption = clicked.get()
     if moodOption:
         PAPERQUOTES_API_ENDPOINT = f'https://api.paperquotes.com/apiv1/quotes/?tags={moodOption}&random=random&limit=200'
-        response = requests.get(PAPERQUOTES_API_ENDPOINT, headers={'Authorization': f'TOKEN {TOKEN}'})
+        response = requests.get(PAPERQUOTES_API_ENDPOINT, headers={'Authorization': f'TOKEN {PAPERQUOTES_TOKEN}'})
         if response.ok:
             quotes = json.loads(response.text).get('results')
             quotes_list = []
@@ -58,9 +63,11 @@ def tweetFn():
             except:
                 tweepy.Forbidden()
                 quote_choice = random.choice(quotes_list)
-                createImg(quote_choice)
-                api.update_status(f"{quote_choice.get('quote')}\n-{quote_choice.get('author')}")
-            statusLabel = Label(root, text="Head to your profile to receive tWizdom!", font=("Poppins",10), bg="#c0deed", fg="#ffffff")
+                quote_text = f'''{quote_choice.get('quote')}
+                \u000a\u000a\u0009\u0009-{quote_choice.get('author')}'''
+                createImg(quote_text)
+                api.update_status_with_media(status=None, filename="./assets/quote1.png")
+            statusLabel = Label(root, text="Head to your profile to receive tWizdom!", font=("Poppins",10), bg="#c0deed", fg="#0084b4")
             statusLabel.grid(row=5, column=0, pady=10)
             root.after(2000, lambda : statusLabel.grid_forget())
 
